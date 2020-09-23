@@ -1,5 +1,7 @@
 # model
 project_1/checkpoints/*
+*/*.out
+*/saved_state_dict/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
