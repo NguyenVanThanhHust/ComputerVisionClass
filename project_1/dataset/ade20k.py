@@ -42,6 +42,7 @@ class ADE20K(data.Dataset):
         self.non_bbox = {3757, 14300, }
     def __len__(self):
         return int(len(self.list) / 2)
+        # return 10
 
     def __getitem__(self, index):
         path = self.list[2*index]
