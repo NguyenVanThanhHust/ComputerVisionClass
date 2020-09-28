@@ -11,7 +11,7 @@ from torchvision import transforms, models
 import re
 import math
 
-class ADE20K(data.Dataset):
+class ADE20K_full(data.Dataset):
     def __init__(
         self,
         root,
@@ -31,11 +31,8 @@ class ADE20K(data.Dataset):
         self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.mean = np.array([104.00699, 116.66877, 122.67892])
         self.files = collections.defaultdict(list)
-        if split == "training":
-            with open("dataset/train.pkl", "rb") as fp:
-                self.list = pickle.load(fp)
-        elif split == "validation":
-            with open("dataset/val.pkl", "rb") as fp:
+        if split == "validation_full":
+            with open("dataset/val_full.pkl", "rb") as fp:
                 self.list = pickle.load(fp)
         else:
             print("check list file and split type. This must be in set {training, validation, valdation_full}")
@@ -88,8 +85,10 @@ class ADE20K(data.Dataset):
 
         image_id = torch.tensor([idx])
         print(image_id, boxes.shape)
-
-        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+        if num_objs == 0:
+            area = 0
+        else:
+            area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         # suppose all instances are not crowd
         iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
 
@@ -113,7 +112,7 @@ class ADE20K(data.Dataset):
 #    train_transforms = torchvision.transforms.Compose([
 #        transforms.ToTensor(),
 #        ])
-#    dataset = ADE20K(local_path, split="validation_full", transforms=train_transforms)
+#    dataset = ADE20K_full(local_path, split="validation_full", transforms=train_transforms)
 #    print("Number of example: ", dataset.__len__())
 #    # define training and validation data loaders
 #    data_loader = torch.utils.data.DataLoader(
@@ -122,4 +121,4 @@ class ADE20K(data.Dataset):
 #
 #    for i in range(dataset.__len__()):
 #        h = dataset.__getitem__(i)
-#            
+            
