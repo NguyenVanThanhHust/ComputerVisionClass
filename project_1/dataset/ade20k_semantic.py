@@ -11,7 +11,7 @@ from torchvision import transforms, models
 import re
 import math
 
-class ADE20K(data.Dataset):
+class ADE20K_semantic(data.Dataset):
     def __init__(
         self,
         root,
@@ -40,9 +40,6 @@ class ADE20K(data.Dataset):
         else:
             print("check list file and split type")
         self.non_bbox = {3757, 14300, }
-
-    def __len__(self):
-        return int(len(self.list) / 2)
 
     def __getitem__(self, index):
         path = self.list[2*index]

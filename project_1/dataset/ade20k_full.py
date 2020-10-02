@@ -84,9 +84,9 @@ class ADE20K_full(data.Dataset):
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         image_id = torch.tensor([idx])
-        print(image_id, boxes.shape)
         if num_objs == 0:
-            area = 0
+            area = [0]
+            area = torch.as_tensor(area, dtype=torch.float32)
         else:
             area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         # suppose all instances are not crowd
