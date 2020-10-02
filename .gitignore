@@ -1,5 +1,7 @@
 # model
 project_1/checkpoints/*
+*/*.pth
+*/*.pth.tar
 */*.out
 */saved_state_dict/*
 /pytorch-YOLOv4-master/pretrained_models/*
