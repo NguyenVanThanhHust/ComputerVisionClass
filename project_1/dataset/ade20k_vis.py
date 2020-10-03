@@ -15,7 +15,7 @@ class ADE20K(data.Dataset):
     def __init__(
         self,
         root,
-        split="training",
+        split="TEST",
         transforms=None,
         img_size=512,
         augmentations=None,
@@ -31,10 +31,7 @@ class ADE20K(data.Dataset):
         self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.mean = np.array([104.00699, 116.66877, 122.67892])
         self.files = collections.defaultdict(list)
-        if split == "TRAIN":
-            with open("dataset/train.pkl", "rb") as fp:
-                self.list = pickle.load(fp)
-        elif split == "TEST":
+        if split == "TEST":
             with open("dataset/val.pkl", "rb") as fp:
                 self.list = pickle.load(fp)
         else:
@@ -42,7 +39,7 @@ class ADE20K(data.Dataset):
         self.non_bbox = {3757, 14300, }
 
     def __len__(self):
-        return int(len(self.list) / 2)
+        return 10
 
     def __getitem__(self, index):
         path = self.list[2*index]
@@ -101,18 +98,8 @@ class ADE20K(data.Dataset):
         target["iscrowd"] = iscrowd
         if self.transforms is not None:
             img = self.transforms(img)
-        return img, target
+        return img_path, img, target
 
-def test_batchify_fn(data):
-    error_msg = "batch must contain tensors, tuples or lists; found {}"
-    if isinstance(data[0], (str, torch.Tensor)):
-        return list(data)
-    elif isinstance(data[0], (tuple, list)):
-        data = zip(*data)
-        return [test_batchify_fn(i) for i in data]
-    raise TypeError((error_msg.format(type(batch[0]))))
-    
-            
 #if __name__ == "__main__":
 #    def collate_fn(batch):
 #        return tuple(zip(*batch))

@@ -196,15 +196,24 @@ class ADE20K_full(data.Dataset):
             ymax = np.max(pos[0])
             boxes.append([xmin, ymin, xmax, ymax])
         # convert everything into a torch.Tensor
-        boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        # there is only one class
-        labels = torch.ones((num_objs,), dtype=torch.int64)
-        difficulties = torch.zeros((num_objs,), dtype=torch.int64)
-
+        if num_objs > 0:
+            boxes = torch.as_tensor(boxes, dtype=torch.float32)
+            # there is only one class
+            labels = torch.ones((num_objs,), dtype=torch.int64)
+            difficulties = torch.zeros((num_objs,), dtype=torch.int64)
+        else:
+            boxes.append([0, 0, 1.0, 1.0])
+            boxes = torch.as_tensor(boxes, dtype=torch.float32)
+            # there is only one class
+            labels = torch.ones((num_objs,), dtype=torch.int64)
+            difficulties = torch.zeros((num_objs,), dtype=torch.int64)
         image_id = torch.tensor([idx])
         # print(image_id, boxes.shape)
+        if num_objs > 0:
+            area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+        else:
+            area = 0
 
-        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         # suppose all instances are not crowd
 
         if self.transforms is not None:

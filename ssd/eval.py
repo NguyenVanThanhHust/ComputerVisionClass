@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore")
 from utils import *
 from custom_datasets import ADE20K, ADE20K_full
 from tqdm import tqdm
@@ -10,7 +12,7 @@ pp = PrettyPrinter()
 data_folder = './'
 keep_difficult = True  # difficult ground truth objects must always be considered in mAP calculation, because these objects DO exist!
 batch_size = 64
-workers = 4
+workers = 0
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 checkpoint = './checkpoint_ssd300.pth.tar'
 
@@ -61,7 +63,10 @@ def evaluate(test_loader, model):
             predicted_locs, predicted_scores = model(images)
 
             # Detect objects in SSD output
-            det_boxes_batch, det_labels_batch, det_scores_batch = model.detect_objects(predicted_locs, predicted_scores,
+#            det_boxes_batch, det_labels_batch, det_scores_batch = model.detect_objects(predicted_locs, predicted_scores,
+#                                                                                       min_score=0.01, max_overlap=0.45,
+#                                                                                       top_k=200)
+            det_boxes_batch, det_labels_batch, det_scores_batch = model.detect_objects_nms(predicted_locs, predicted_scores,
                                                                                        min_score=0.01, max_overlap=0.45,
                                                                                        top_k=200)
             # Evaluation MUST be at min_score=0.01, max_overlap=0.45, top_k=200 for fair comparision with the paper's results and other repos

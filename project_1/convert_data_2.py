@@ -45,7 +45,7 @@ def main(data_path, out, **args):
                 
                 ## Process segmentation and save
                 instance_ids = load_chair_attribute(os.path.join(input_dir2, img_name.replace(".jpg", "_atr.txt")))
-                if len(instance_ids) > 0:
+                if len(instance_ids) > -1:
                     shutil.copy(os.path.join(input_dir2, img_name), os.path.join(out_dir, img_name))
                     converted_seg = convert_segmentation(os.path.join(input_dir2, img_name.replace(".jpg", "_seg.png")), instance_ids)
                     cv2.imwrite(os.path.join(out_dir, img_name.replace(".jpg", "_seg.png")), converted_seg)
