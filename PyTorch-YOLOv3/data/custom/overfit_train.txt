@@ -1,0 +1,1 @@
+../../data/ADE20K_chair/training/d/delicatessen/ADE_train_00006640.jpg 0 0.278 0.8546666666666667 0.176 0.28 

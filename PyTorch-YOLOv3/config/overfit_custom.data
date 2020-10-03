@@ -1,0 +1,4 @@
+classes= 1
+train=data/custom/overfit_train.txt
+valid=data/custom/overfit_valid.txt
+names=data/custom/classes.names

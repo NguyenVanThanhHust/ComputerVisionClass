@@ -3,8 +3,13 @@ project_1/checkpoints/*
 */*.pth
 */*.pth.tar
 */*.out
+*/*/*.pth
 */saved_state_dict/*
+PyTorch-YOLOv3/weights/darknet53.conv.74
 /pytorch-YOLOv4-master/pretrained_models/*
+
+# log
+PyTorch-YOLOv3/logs/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
