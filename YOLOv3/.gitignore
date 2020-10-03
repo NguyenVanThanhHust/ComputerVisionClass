@@ -8,6 +8,7 @@ output
 data/coco
 backup
 weights/*.weights
+logs/*
 weights/*
 __pycache__
 checkpoints
