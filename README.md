@@ -12,11 +12,13 @@ Your folder structure should look like this
 │   ├── ComputerVisionClass         # Source 
 │       ├──MaskRCNN                 # Instance Segmentation with Mask RCNN 
 │       ├──YOLOv3                   # Instance Detection with YOLOv3
-│       ├──semantic segmentation    # Semantic Segmentation with Mask RCNN
+│       ├──semantic segmentation    # Semantic Segmentation
+│       ├──MaskRCNN_C               # Foldable chair Recognition
 └── ...
 
 2. To reproduce results
 - Convert ADE2OK dataset to suitable format with ComputerVisionClass/MaskRCNN/Filter_Chair.ipynb
+
 - For instance segmentation of MaskRCNN
 ```cd ~/projects/ComputerVisionClass/MaskRCNN```
 To train
@@ -38,5 +40,11 @@ To visualize result
 ```nohup python3.7 -u train.py &> train.out &```
 ```nohup python3.7 -u test.py &> eval.out &```
 
-Training log is at train.out
-Test log is at test.out
+- For 2 classes chair recogntion
+```cd ~/projects/ComputerVisionClass/MaskRCNN_C```
+```nohup python3.7 -u finetune.py &> train.out &```
+```nohup python3.7 -u evaluate.py &> eval.out &```
+
+For each task, we have:
+- Training log is at train.out
+- Test log is at test.out
