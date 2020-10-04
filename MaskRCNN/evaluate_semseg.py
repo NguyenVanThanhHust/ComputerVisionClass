@@ -12,8 +12,7 @@ import math
 from coco_utils import get_coco_api_from_dataset
 from coco_eval import CocoEvaluator
 
-from dataset.ade20k import ADE20K
-from dataset.ade20k_full import ADE20K_full
+from dataset.ade20k_full_semantic import ADE20K_full_semantic
 
 from model import get_model_instance_segmentation
 import torchvision
@@ -55,7 +54,7 @@ def evaluate(model, data_loader, device):
     coco = get_coco_api_from_dataset(data_loader.dataset)
     iou_types = _get_iou_types(model)
     coco_evaluator = CocoEvaluator(coco, iou_types)
-
+    list_iou = []
     for images, targets in metric_logger.log_every(data_loader, 100, header):
         images = list(img.to(device) for img in images)
 
@@ -67,11 +66,27 @@ def evaluate(model, data_loader, device):
         model_time = time.time() - model_time
 
         res = {target["image_id"].item(): output for target, output in zip(targets, outputs)}
+        tmp_res = outputs[0]
+        out_masks = tmp_res["masks"].mul(255).byte().cpu().numpy()
+        tar_mask = targets[0]["masks"].mul(255).byte().cpu().numpy().squeeze()
+        out_mask = np.zeros(shape = tar_mask.shape, dtype= tar_mask.dtype)
+        for each_out_mask in out_masks:
+            out_mask = np.logical_or(out_mask, each_out_mask)
+        out_mask = out_mask.squeeze()
+        intersection = np.logical_and(out_mask, tar_mask)
+        union = np.logical_or(out_mask, tar_mask)
+        iou_score = np.sum(intersection) / np.sum(union)
+        print(iou_score)
+        if math.isnan(iou_score):
+            k = 1
+        else:
+            list_iou.append(iou_score)
+        del out_mask, tar_mask
         evaluator_time = time.time()
         coco_evaluator.update(res)
         evaluator_time = time.time() - evaluator_time
         metric_logger.update(model_time=model_time, evaluator_time=evaluator_time)
-
+    print("Mean iou: {}".format(sum(list_iou)/len(list_iou)))
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
     print("Averaged stats:", metric_logger)
@@ -98,7 +113,7 @@ def main():
     train_transforms = torchvision.transforms.Compose([
         transforms.ToTensor(),
         ])
-    dataset_test = ADE20K_full(local_path, split="validation_full", transforms=train_transforms)
+    dataset_test = ADE20K_full_semantic(local_path, split="validation_full", transforms=train_transforms)
     print("Number of val example: ", dataset_test.__len__())
 
     data_loader_test = torch.utils.data.DataLoader(
@@ -110,7 +125,7 @@ def main():
 
     # move model to the right device
     model.to(device)
-    state = torch.load("./saved_state_dict/state_dict_27_0.16393402218818665.pt")
+    state = torch.load("./saved_state_dict/state_dict_21_0.2586383521556854.pt")
     model.load_state_dict(state["model_state_dict"])
     evaluate(model, data_loader_test, device=device)
     print("That's it!")

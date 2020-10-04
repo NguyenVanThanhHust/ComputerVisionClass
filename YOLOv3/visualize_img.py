@@ -24,7 +24,7 @@ color = (255, 0, 0)
   
 # Line thickness of 2 px 
 thickness = 2
-
+import time
 if not osp.isdir("visualized_img"):
     os.mkdir("visualized_img")
 def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size):
@@ -49,22 +49,25 @@ def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size
         imgs = Variable(imgs.type(Tensor), requires_grad=False)
 
         with torch.no_grad():
+            ts = time.time()
             outputs = model(imgs)
             outputs = non_max_suppression(outputs, conf_thres=conf_thres, nms_thres=nms_thres)
-            for idx, (img_path, img, output) in enumerate(zip(img_paths, imgs, outputs)):
-                image = cv2.imread(img_path)
-                h, w, c = image.shape
-                image = cv2.resize(image, (416, 416))
-                folder = img_path.split("/")
-                img_name = folder[-1]
-                for pred in output:
-                    x1, y1, x2, y2, object_conf, class_score, class_pred = pred
-                    start_pt = (int(x1), int(y1))
-                    end_pt = (int(x2), int(y2))
-                    image = cv2.rectangle(image, start_pt, end_pt, color, thickness)
-                image = cv2.resize(image, (w, h))
-                new_path = osp.join("visualized_img", img_name)
-                cv2.imwrite(new_path, image)
+            te = time.time()
+            print("time: {}".format(te -ts))
+#            for idx, (img_path, img, output) in enumerate(zip(img_paths, imgs, outputs)):
+#                image = cv2.imread(img_path)
+#                h, w, c = image.shape
+#                image = cv2.resize(image, (416, 416))
+#                folder = img_path.split("/")
+#                img_name = folder[-1]
+#                for pred in output:
+#                    x1, y1, x2, y2, object_conf, class_score, class_pred = pred
+#                    start_pt = (int(x1), int(y1))
+#                    end_pt = (int(x2), int(y2))
+#                    image = cv2.rectangle(image, start_pt, end_pt, color, thickness)
+#                image = cv2.resize(image, (w, h))
+#                new_path = osp.join("visualized_img", img_name)
+#                cv2.imwrite(new_path, image)
         if batch_i > 1:
             break
 
