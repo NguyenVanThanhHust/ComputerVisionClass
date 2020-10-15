@@ -17,7 +17,8 @@ from torch.utils.data import Dataset
 
 
 def download():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    BASE_DIR = "../../../"
     DATA_DIR = os.path.join(BASE_DIR, 'data')
     if not os.path.exists(DATA_DIR):
         os.mkdir(DATA_DIR)
@@ -31,7 +32,9 @@ def download():
 
 def load_data(partition):
     download()
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    BASE_DIR = "../../../"
+    # print(BASE_DIR)
     DATA_DIR = os.path.join(BASE_DIR, 'data')
     all_data = []
     all_label = []

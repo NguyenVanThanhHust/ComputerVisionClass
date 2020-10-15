@@ -22,7 +22,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 from util import cal_loss, IOStream
 import sklearn.metrics as metrics
-
+import time
 
 def _init_():
     if not os.path.exists('checkpoints'):
@@ -68,8 +68,8 @@ def train(args, io):
     criterion = cal_loss
 
     best_test_acc = 0
+    train_time = []
     for epoch in range(args.epochs):
-        scheduler.step()
         ####################
         # Train
         ####################
@@ -78,6 +78,7 @@ def train(args, io):
         model.train()
         train_pred = []
         train_true = []
+        start_time_in_epoch = time.time()
         for data, label in train_loader:
             data, label = data.to(device), label.to(device).squeeze()
             data = data.permute(0, 2, 1)
@@ -92,6 +93,7 @@ def train(args, io):
             train_loss += loss.item() * batch_size
             train_true.append(label.cpu().numpy())
             train_pred.append(preds.detach().cpu().numpy())
+        scheduler.step()
         train_true = np.concatenate(train_true)
         train_pred = np.concatenate(train_pred)
         outstr = 'Train %d, loss: %.6f, train acc: %.6f, train avg acc: %.6f' % (epoch,
@@ -101,7 +103,11 @@ def train(args, io):
                                                                                  metrics.balanced_accuracy_score(
                                                                                      train_true, train_pred))
         io.cprint(outstr)
-
+        
+        end_time_in_epoch = time.time()
+        epoch_time = end_time_in_epoch - start_time_in_epoch
+        train_time.append(epoch_time)
+        print("Train epoch {} : with time: {}".format(epoch, epoch_time))
         ####################
         # Test
         ####################
@@ -133,7 +139,8 @@ def train(args, io):
         if test_acc >= best_test_acc:
             best_test_acc = test_acc
             torch.save(model.state_dict(), 'checkpoints/%s/models/model.t7' % args.exp_name)
-
+    average_train_time = sum(train_time) / len(train_time)
+    print("Average time to train one epochs: {}".format(average_train_time))
 
 def test(args, io):
     test_loader = DataLoader(ModelNet40(partition='test', num_points=args.num_points),
