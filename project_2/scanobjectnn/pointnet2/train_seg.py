@@ -34,8 +34,8 @@ parser.add_argument('--norm', default = True, help='Whether to normalize data or
 parser.add_argument('--center_data', default = True, help='Whether to explicitly center the data [default: False]')
 parser.add_argument('--seg_weight', type=int, default=0.5, help='Segmentation weight in loss')
 
-parser.add_argument('--train_file', default = 'h5_files/main_split/training_objectdataset_augmentedrot_scale75.h5', help='Location of test file')
-parser.add_argument('--test_file', default = 'h5_files/main_split/test_objectdataset_augmentedrot_scale75.h5', help='Location of test file')
+parser.add_argument('--train_file', default = '../../../../data/scan_dataset/h5_files/main_split/training_objectdataset_augmentedrot_scale75.h5', help='Location of test file')
+parser.add_argument('--test_file', default = '../../../../data/scan_dataset/h5_files/main_split/test_objectdataset_augmentedrot_scale75.h5', help='Location of test file')
 
 parser.add_argument('--num_point', type=int, default=1024, help='Point Number [default: 1024]')
 parser.add_argument('--max_epoch', type=int, default=250, help='Epoch to run [default: 251]')
@@ -215,7 +215,7 @@ def train():
 
             # Save the variables to disk.
             # if epoch % 10 == 0:
-            save_path = saver.save(sess, os.path.join(LOG_DIR, "model.ckpt"))
+            save_path = saver.save(sess, os.path.join(LOG_DIR, str(epoch) + "_" + "model.ckpt"))
             log_string("Model saved in file: %s" % save_path)
 
 

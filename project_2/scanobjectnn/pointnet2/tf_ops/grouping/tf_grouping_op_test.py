@@ -16,12 +16,12 @@ class GroupPointTest(tf.test.TestCase):
       nsample = 32
       idx, pts_cnt = query_ball_point(radius, nsample, xyz1, xyz2)
       grouped_points = group_point(points, idx)
-      print grouped_points
+      print (grouped_points)
 
     with self.test_session():
-      print "---- Going to compute gradient error"
+      print ("---- Going to compute gradient error")
       err = tf.test.compute_gradient_error(points, (1,128,16), grouped_points, (1,8,32,16))
-      print err
+      print (err)
       self.assertLess(err, 1e-4) 
 
 if __name__=='__main__':

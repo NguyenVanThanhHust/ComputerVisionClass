@@ -8,6 +8,8 @@ matplotlib.use('pdf')
 import importlib
 import argparse
 import tensorflow as tf
+# import tensorflow.compat.v1 as tf
+# tf.disable_v2_behavior() 
 import pickle
 import socket
 
@@ -35,8 +37,8 @@ parser.add_argument('--norm', default = True, help='Whether to normalize data or
 parser.add_argument('--center_data', default = True, help='Whether to explicitly center the data [default: False]')
 parser.add_argument('--num_class', type=int, default = 15, help='Number of classes to classify.')
 
-parser.add_argument('--train_file', default = 'h5_files/main_split/training_objectdataset_augmentedrot_scale75.h5', help='Location of training file')
-parser.add_argument('--test_file', default = 'h5_files/main_split/test_objectdataset_augmentedrot_scale75.h5', help='Location of test file')
+parser.add_argument('--train_file', default = '../../../../data/scan_dataset/h5_files/main_split/training_objectdataset_augmentedrot_scale75.h5', help='Location of training file')
+parser.add_argument('--test_file', default = '../../../../data/scan_dataset/h5_files/main_split/test_objectdataset_augmentedrot_scale75.h5', help='Location of test file')
 
 parser.add_argument('--num_point', type=int, default=1024, help='Point Number [256/512/1024/2048] [default: 1024]')
 parser.add_argument('--max_epoch', type=int, default=200, help='Epoch to run [default: 200]')
@@ -52,41 +54,41 @@ parser.add_argument('--weight_decay', type=float, default=0.0, help='weight deca
 parser.add_argument('--gmm_type',  default='grid', help='type of gmm [grid/learn], learn uses expectation maximization algorithm (EM) [default: grid]')
 parser.add_argument('--num_gaussians', type=int , default=5, help='number of gaussians for gmm, if grid specify subdivisions, if learned specify actual number[default: 5, for grid it means 125 gaussians]')
 parser.add_argument('--gmm_variance', type=float,  default=0.04, help='variance for grid gmm, relevant only for grid type')
-FLAGS = parser.parse_args()
+args = parser.parse_args()
 
 
-N_GAUSSIANS = FLAGS.num_gaussians
-GMM_TYPE = FLAGS.gmm_type
-GMM_VARIANCE = FLAGS.gmm_variance
+N_GAUSSIANS = args.num_gaussians
+GMM_TYPE = args.gmm_type
+GMM_VARIANCE = args.gmm_variance
 
-BATCH_SIZE = FLAGS.batch_size
-NUM_POINT = FLAGS.num_point
-MAX_EPOCH = FLAGS.max_epoch
-BASE_LEARNING_RATE = FLAGS.learning_rate
-GPU_INDEX = FLAGS.gpu
-MOMENTUM = FLAGS.momentum
-OPTIMIZER = FLAGS.optimizer
-DECAY_STEP = FLAGS.decay_step
-DECAY_RATE = FLAGS.decay_rate
-WEIGHT_DECAY = FLAGS.weight_decay
+BATCH_SIZE = args.batch_size
+NUM_POINT = args.num_point
+MAX_EPOCH = args.max_epoch
+BASE_LEARNING_RATE = args.learning_rate
+GPU_INDEX = args.gpu
+MOMENTUM = args.momentum
+OPTIMIZER = args.optimizer
+DECAY_STEP = args.decay_step
+DECAY_RATE = args.decay_rate
+WEIGHT_DECAY = args.weight_decay
 
-WITH_BG = FLAGS.with_bg
-NORMALIZED = FLAGS.norm
-TRAIN_FILE = FLAGS.train_file
-TEST_FILE = FLAGS.test_file
-CENTER_DATA = FLAGS.center_data
+WITH_BG = args.with_bg
+NORMALIZED = args.norm
+TRAIN_FILE = args.train_file
+TEST_FILE = args.test_file
+CENTER_DATA = args.center_data
 
-MODEL = importlib.import_module(FLAGS.model) # import network module
-MODEL_FILE = os.path.join(BASE_DIR, 'models', FLAGS.model+'.py')
+MODEL = importlib.import_module(args.model) # import network module
+MODEL_FILE = os.path.join(BASE_DIR, 'models', args.model+'.py')
 
 #Creat log directory ant prevent over-write by creating numbered subdirectories
-LOG_DIR = FLAGS.log_dir
+LOG_DIR = args.log_dir
 if not os.path.exists(LOG_DIR): os.mkdir(LOG_DIR)
 os.system('cp %s %s' % (MODEL_FILE, LOG_DIR)) # bkp of model def
 os.system('cp train.py %s' % (LOG_DIR)) # bkp of train procedure
 os.system('cp ../data_utils.py %s' % (LOG_DIR)) # bkp of data utils
 LOG_FOUT = open(os.path.join(LOG_DIR, 'log_train.txt'), 'w')
-LOG_FOUT.write(str(FLAGS)+'\n')
+LOG_FOUT.write(str(args)+'\n')
 LOG_FOUT.write("augmentation RSTJ = " + str((augment_rotation, augment_scale, augment_translation, augment_jitter, augment_outlier))) #log augmentaitons
 
 BN_INIT_DECAY = 0.5
@@ -99,7 +101,7 @@ LIMIT_GPU = True
 MAX_ACCURACY = 0.0
 MAX_CLASS_ACCURACY = 0.0
 
-NUM_CLASSES = FLAGS.num_class
+NUM_CLASSES = args.num_class
 print("Number of Classes: "+str(NUM_CLASSES))
 print("Normalized: "+str(NORMALIZED))
 print("Center Data: "+str(CENTER_DATA))
@@ -227,7 +229,7 @@ def train(gmm):
             acc, acc_avg_cls = eval_one_epoch(sess, ops, gmm, test_writer)
 
             # Save the variables to disk.
-            save_path = saver.save(sess, os.path.join(LOG_DIR, "model.ckpt"))
+            save_path = saver.save(sess, os.path.join(LOG_DIR, str(epoch) + "model.ckpt"))
             log_string("Model saved in file: %s" % save_path)
 
             if acc > MAX_ACCURACY:

@@ -6,7 +6,7 @@ import math
 import random
 import numpy as np
 import tensorflow as tf
-from transforms3d.euler import euler2mat
+from transform3d.euler import euler2mat
 
 
 # the returned indices will be used by tf.gather_nd
